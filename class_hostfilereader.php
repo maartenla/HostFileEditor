@@ -93,7 +93,7 @@ class HostFileReader{
                 throw new Exception("Domain must not be empty");
             }
 
-            file_put_contents($this->windowsHostsFile,$ipadress." ".$domain.PHP_EOL,FILE_APPEND);
+            file_put_contents($this->windowsHostsFile,PHP_EOL.$ipadress." ".$domain.PHP_EOL,FILE_APPEND);
         }
         else{
             throw new Exception("File not found");
