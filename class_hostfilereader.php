@@ -5,7 +5,9 @@ class HostFileReader{
     public $windowsHostsFile, $apacheVHostsFile;
 
     public function __construct(){
+        //change if file is in different location
         $this->windowsHostsFile = "C:\\WINDOWS\\system32\\drivers\\etc\\hosts";
+        //change if file is in different location
         $this->apacheVHostsFile = "C:\\xampp\\apache\\conf\\extra\\httpd-vhosts.conf";
     }
 
@@ -131,5 +133,7 @@ class HostFileReader{
             throw new Exception("File not found");
         }
     }
+
+    //regex: (#+)?(NameVirtualHost)
 }
 ?>
