@@ -22,11 +22,17 @@ switch($_GET["action"]){
 
     case "add_apa": addApache();break;
 
-    case "add_both":addBoth();break;
+    case "status_apassl": changeStatusApacheSSL();break;
+
+    case"delete_apassl": deleteApacheSSL();break;
+
+    case "add_apassl": addApacheSSL();break;
+
+    case "add_all":addAll();break;
 
 }
 
-function addBoth(){
+function addAll(){
     try{
         $documentroot = $_POST["documentroot"];
         $domain = $_POST["domain"];
@@ -37,6 +43,10 @@ function addBoth(){
         $oHostFileReader->addWindowsHost($ipaddress,$domain);
 
         $oHostFileReader->addApacheVHost($documentroot,$domain);
+
+	    if($_POST['ssl'] == 1){
+            $oHostFileReader->addApacheSSL($documentroot,$domain);
+	    }
 
     }
     catch(Exception $e){
@@ -95,6 +105,53 @@ function changeStatusApache(){
 
     header("location: index.php");
 
+}
+
+
+function addApacheSSL(){
+	try{
+		$documentroot = $_POST["documentroot"];
+		$servername = $_POST["servername"];
+
+		$oHostFileReader = new HostFileReader();
+
+		$oHostFileReader->addApacheSSL($documentroot,$servername);
+	}
+	catch(Exception $e){
+		echo($e->getMessage());
+		echo("<br><a href='index.php'>click to go back</a>");
+		die();
+	}
+
+	header("location: index.php");
+}
+
+function deleteApacheSSL(){
+	try{
+		$servername = $_GET["servername"];
+
+		$oHostFileReader = new HostFileReader();
+
+		$oHostFileReader->deleteApacheSSL($servername);
+	}
+	catch(Exception $e){
+		echo($e->getMessage());
+		echo("<br><a href='index.php'>click to go back</a>");
+		die();
+	}
+
+	header("location: index.php");
+}
+
+function changeStatusApacheSSL(){
+	$servername = $_GET["servername"];
+	$status = $_GET["to"];
+
+	$oHostFileReader = new HostFileReader();
+
+	$oHostFileReader->changeApacheSSLStatus($servername,$status);
+
+	header("location: index.php");
 }
 
 function changeStatusWin(){

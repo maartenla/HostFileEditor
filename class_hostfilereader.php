@@ -2,13 +2,15 @@
 
 class HostFileReader{
 
-    public $windowsHostsFile, $apacheVHostsFile;
+    public $windowsHostsFile, $apacheVHostsFile, $apacheSSLFile;
 
     public function __construct(){
         //change if file is in different location
         $this->windowsHostsFile = "C:\\WINDOWS\\system32\\drivers\\etc\\hosts";
         //change if file is in different location
         $this->apacheVHostsFile = "C:\\xampp\\apache\\conf\\extra\\httpd-vhosts.conf";
+	    //change if file is in different location
+        $this->apacheSSLFile = "C:\\xampp\\apache\\conf\\extra\\httpd-ssl.conf";
     }
 
     public function getWindowsHosts(){
@@ -274,7 +276,181 @@ class HostFileReader{
         }
     }
 
-    public function addApacheVHost($documentroot,$servername){
+	public function addApacheVHost($documentroot,$servername){
+		$documentroot = trim($documentroot);
+		$servername = trim($servername);
+		if($documentroot == ""){
+			throw new Exception("Document root cannot be empty");
+		}
+
+		if($servername == ""){
+			throw new Exception("Servername cannot be empty");
+		}
+
+		$content = PHP_EOL."<VirtualHost *>".PHP_EOL;
+		$content .= "DocumentRoot \"".$documentroot."\"".PHP_EOL;
+		$content .= "ServerName ".$servername.PHP_EOL;
+		$content .= "<Directory \"".$documentroot."\">".PHP_EOL;
+		$content .= "Order allow,deny".PHP_EOL;
+		$content .= "Allow from all".PHP_EOL;
+		$content .= "</Directory>".PHP_EOL;
+		$content .= "</VirtualHost>";
+
+		if(file_exists($this->apacheVHostsFile)){
+			file_put_contents($this->apacheVHostsFile,$content,FILE_APPEND);
+		}
+		else{
+			throw new Exception("File not found");
+		}
+	}
+
+	//---------------------------
+
+	public function getApacheSSLHosts(){
+		if(file_exists($this->apacheSSLFile)){
+			$file = file_get_contents($this->apacheSSLFile);
+
+			$matches = array();
+
+			$regex = '/(#*)\s*<VirtualHost \*.+?((?:DocumentRoot ".+?")|(?:ServerName .+?\r)).*?((?:DocumentRoot ".+?")|(?:ServerName .+?\r)).*?<\/VirtualHost>/ism';
+
+			preg_match_all($regex,$file,$matches);
+
+			$servers = array();
+
+			foreach($matches[1] as $key => $val){
+				if(stripos($matches[2][$key],"documentroot") === 0){
+					$documentroot = trim(str_ireplace("documentroot","",$matches[2][$key]));
+					$documentroot = str_replace("\"","",$documentroot);
+					$servername = trim(str_ireplace("servername","",$matches[3][$key]));
+
+					$servers[] = array($val,$documentroot,$servername);
+				}
+				elseif(stripos($matches[2][$key],"servername") === 0){
+					$documentroot = trim(str_ireplace("documentroot","",$matches[3][$key]));
+					$documentroot = str_replace("\"","",$documentroot);
+					$servername = trim(str_ireplace("servername","",$matches[2][$key]));
+
+					$servers[] = array($val,$documentroot,$servername);
+				}
+			}
+
+			return $servers;
+		}
+		else{
+			throw new Exception("File not found");
+		}
+	}
+
+	public function changeApacheSSLStatus($servername,$tostatus){
+		if(file_exists($this->apacheSSLFile)){
+			if(trim($servername) == ""){
+				throw new Exception("Servername empty");
+			}
+			$file = file($this->apacheSSLFile);
+
+			$iVHostStart = -1;
+
+			$aTmp = array();
+
+			$fileString = "";
+
+			$bProcessTmp = false;
+			foreach($file as $key => $line){
+				if(preg_match("/(?:#*)\s*(<virtualhost)/i",$line) > 0){
+					$iVHostStart = $key;
+				}
+				if(preg_match("/servername\s*(".$servername.")/i",$line) > 0){
+					$bProcessTmp = true;
+				}
+				if($iVHostStart > 0){
+					$aTmp[$key]=$line;
+				}
+				if(preg_match("/(?:#*)\s*(<\/virtualhost)/i",$line) > 0){
+
+					if($bProcessTmp){
+
+						foreach($aTmp as $tmpkey=>$tmpline){
+							if(preg_match("/(#)/",$tmpline) > 0 && $tostatus == "e"){
+
+								$file[$tmpkey] = str_replace("#","",$tmpline);
+							}
+							else{
+								if($tostatus == "d" && preg_match("/(#)/",$tmpline) < 1){
+									$file[$tmpkey] = "##".$tmpline;
+								}
+							}
+						}
+						$bProcessTmp = false;
+					}
+
+					$aTmp = array();
+					$iVHostStart = -1;
+				}
+			}
+
+			foreach($file as $line){
+				$fileString.=$line;
+			}
+			file_put_contents($this->apacheSSLFile,$fileString);
+		}
+		else{
+			throw new Exception("File not found");
+		}
+	}
+
+	public function deleteApacheSSL($servername){
+		if(file_exists($this->apacheSSLFile)){
+
+			if(trim($servername) == ""){
+				throw new Exception("Servername empty");
+			}
+
+
+			$file = file($this->apacheSSLFile);
+
+			$iVHostStart = -1;
+
+			$aTmp = array();
+
+			$fileString = "";
+
+			$bProcessTmp = false;
+			foreach($file as $key => $line){
+				if(preg_match("/(?:#*)\s*(<virtualhost)/i",$line) > 0){
+					$iVHostStart = $key;
+				}
+				if(preg_match("/servername\s*(".$servername.")/i",$line) > 0){
+					$bProcessTmp = true;
+				}
+				if($iVHostStart > 0){
+					$aTmp[$key]=$line;
+				}
+				if(preg_match("/(?:#*)\s*(<\/virtualhost)/i",$line) > 0){
+
+					if($bProcessTmp){
+
+						foreach($aTmp as $tmpkey=>$tmpline){
+							unset($file[$tmpkey]);
+						}
+						$bProcessTmp = false;
+					}
+					$aTmp = array();
+					$iVHostStart = -1;
+				}
+			}
+
+			foreach($file as $line){
+				$fileString.=$line;
+			}
+			file_put_contents($this->apacheSSLFile,$fileString);
+		}
+		else{
+			throw new Exception("File not found");
+		}
+	}
+
+    public function addApacheSSL($documentroot,$servername){
         $documentroot = trim($documentroot);
         $servername = trim($servername);
         if($documentroot == ""){
@@ -288,14 +464,17 @@ class HostFileReader{
         $content = PHP_EOL."<VirtualHost *>".PHP_EOL;
         $content .= "DocumentRoot \"".$documentroot."\"".PHP_EOL;
         $content .= "ServerName ".$servername.PHP_EOL;
+        $content .= "SSLEngine on".PHP_EOL;
+        $content .= "SSLCertificateFile conf/ssl.crt/server.crt".PHP_EOL;
+        $content .= "SSLCertificateKeyFile conf/ssl.key/server.key".PHP_EOL;
         $content .= "<Directory \"".$documentroot."\">".PHP_EOL;
         $content .= "Order allow,deny".PHP_EOL;
         $content .= "Allow from all".PHP_EOL;
         $content .= "</Directory>".PHP_EOL;
         $content .= "</VirtualHost>";
 
-        if(file_exists($this->apacheVHostsFile)){
-            file_put_contents($this->apacheVHostsFile,$content,FILE_APPEND);
+        if(file_exists($this->apacheSSLFile)){
+            file_put_contents($this->apacheSSLFile,$content,FILE_APPEND);
         }
         else{
             throw new Exception("File not found");
