@@ -287,7 +287,7 @@ class HostFileReader{
 			throw new Exception("Servername cannot be empty");
 		}
 
-		$content = PHP_EOL."<VirtualHost *>".PHP_EOL;
+		$content = PHP_EOL."<VirtualHost *:80>".PHP_EOL;
 		$content .= "DocumentRoot \"".$documentroot."\"".PHP_EOL;
 		$content .= "ServerName ".$servername.PHP_EOL;
 		$content .= "<Directory \"".$documentroot."\">".PHP_EOL;
@@ -461,7 +461,7 @@ class HostFileReader{
             throw new Exception("Servername cannot be empty");
         }
 
-        $content = PHP_EOL."<VirtualHost *>".PHP_EOL;
+        $content = PHP_EOL."<VirtualHost *:443>".PHP_EOL;
         $content .= "DocumentRoot \"".$documentroot."\"".PHP_EOL;
         $content .= "ServerName ".$servername.PHP_EOL;
         $content .= "SSLEngine on".PHP_EOL;
