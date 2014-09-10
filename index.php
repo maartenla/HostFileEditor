@@ -96,7 +96,7 @@ if(!$bError){
                     ?>
                     <tr>
                         <td><?= $aWindowsHost[2] ?></td>
-                        <td><a href="<?= $aWindowsHost[3] ?>" target="_blank"><?= $aWindowsHost[3] ?></a></td>
+                        <td><a href="http://<?= $aWindowsHost[3] ?>" target="_blank"><?= $aWindowsHost[3] ?></a></td>
                         <td class="status"><a href="formhandler.php?action=status_win&to=<?= $toStatus ?>&domain=<?= $aWindowsHost[3] ?>&ip=<?= $aWindowsHost[2] ?>"><img src="<?=$sStatusImage?>" alt="enable/disable" /></a></td>
                         <td class="delete"><a href="formhandler.php?action=delete_win&domain=<?= $aWindowsHost[3] ?>&ipaddress=<?= $aWindowsHost[2] ?>"><img src="images/delete_16.png" alt="delete" /></a></td>
                     </tr>
@@ -163,7 +163,7 @@ if(!$bError){
                 ?>
             <tr>
                 <td><?= $aApacheSSLHost[1] ?></td>
-                <td class="servername"><a href="<?= $aApacheSSLHost[2] ?>" target="_blank"><?= $aApacheSSLHost[2] ?></a></td>
+                <td class="servername"><a href="http://<?= $aApacheSSLHost[2] ?>" target="_blank"><?= $aApacheSSLHost[2] ?></a></td>
                 <td class="status"><a href="formhandler.php?action=status_apa&to=<?= $toStatus ?>&servername=<?= $aApacheSSLHost[2] ?>"><img src="<?=$sStatusImage?>" alt="enable/disable" /></a></td>
                 <td class="delete"><a href="formhandler.php?action=delete_apa&servername=<?= $aApacheSSLHost[2] ?>"><img src="images/delete_16.png" alt="delete" /></a></td>
             </tr>
@@ -231,7 +231,7 @@ else{
 							?>
 							<tr>
 								<td><?= $aApacheSSLHost[1] ?></td>
-								<td class="servername"><a href="<?= $aApacheSSLHost[2] ?>" target="_blank"><?= $aApacheSSLHost[2] ?></a></td>
+								<td class="servername"><a href="https://<?= $aApacheSSLHost[2] ?>" target="_blank"><?= $aApacheSSLHost[2] ?></a></td>
 								<td class="status"><a href="formhandler.php?action=status_apassl&to=<?= $toStatus ?>&servername=<?= $aApacheSSLHost[2] ?>"><img src="<?=$sStatusImage?>" alt="enable/disable" /></a></td>
 								<td class="delete"><a href="formhandler.php?action=delete_apassl&servername=<?= $aApacheSSLHost[2] ?>"><img src="images/delete_16.png" alt="delete" /></a></td>
 							</tr>
