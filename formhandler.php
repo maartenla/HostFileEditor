@@ -30,6 +30,8 @@ switch($_GET["action"]){
 
     case "add_all":addAll();break;
 
+    case "quickadd":quickAdd();break;
+
 }
 
 function addAll(){
@@ -56,6 +58,33 @@ function addAll(){
     }
 
     header("location: index.php");
+}
+
+
+function quickAdd(){
+	try{
+		$documentroot   = urldecode($_GET["path"]);
+		$domain         = urldecode($_GET["domain"]);
+		$ipaddress      = '127.0.0.1';
+
+		$oHostFileReader = new HostFileReader();
+
+		$oHostFileReader->addWindowsHost($ipaddress,$domain);
+
+		$oHostFileReader->addApacheVHost($documentroot,$domain);
+
+		if($_GET['ssl'] == 1){
+			$oHostFileReader->addApacheSSL($documentroot,$domain);
+		}
+
+	}
+	catch(Exception $e){
+		echo($e->getMessage());
+		echo("<br><a href='index.php'>click to go back</a>");
+		die();
+	}
+
+	header("location: index.php");
 }
 
 function addApache(){

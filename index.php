@@ -1,7 +1,27 @@
 <?php
 include_once("class_hostfilereader.php");
+$projectPath = 'C:'.DIRECTORY_SEPARATOR .'xampp'.DIRECTORY_SEPARATOR .'htdocs'.DIRECTORY_SEPARATOR;
 
 $oHostFileReader = new HostFileReader();
+
+try{
+	$aWindowsHosts = $oHostFileReader->getWindowsHosts();
+}
+catch(Exception $e){
+	$bError = true;
+	$sMsg = $e->getMessage();
+}
+
+function hasHost($host){
+	global $aWindowsHosts;
+	foreach($aWindowsHosts as $whost){
+		if(strpos(strtolower($whost[3]), strtolower($host)) !== false){
+			return true;
+		}
+	}
+	return false;
+}
+
 ?>
 <style>
 	* {
@@ -47,6 +67,60 @@ $oHostFileReader = new HostFileReader();
             <button type='submit'>Add</button>
         </form>
 
+		    <table class="host-table" cellpadding="2" cellspacing="0">
+			    <thead>
+			    <tr>
+				    <th>IP Address</th>
+				    <th>Directory</th>
+				    <th>&nbsp;</th>
+				    <th>Domain</th>
+				    <th>&nbsp;</th>
+				    <th>&nbsp;</th>
+				    <th>&nbsp;</th>
+				    <th>&nbsp;</th>
+			    </tr>
+			    </thead>
+			    <tbody>
+			    <?
+			    foreach(scandir($projectPath) as $dir) {
+				    $path = $projectPath.$dir;
+                    
+                    $possibledocumentroots = ['www', 'STAR', 'private_html'];
+                    
+                    if(!file_exists($path . DIRECTORY_SEPARATOR . 'index.php') || !file_exists($path . DIRECTORY_SEPARATOR . 'index.html')){
+                        foreach($possibledocumentroots as $documentroot){
+                            if(file_exists($path . DIRECTORY_SEPARATOR.$documentroot.DIRECTORY_SEPARATOR.'index.php')){
+                                $path = $path . DIRECTORY_SEPARATOR.$documentroot;
+                            }
+                        }
+                    }
+                    
+				    if(hasHost($dir)){
+					    continue;
+				    }
+
+				    //exceptions
+				    if(!in_array($dir, ['.', '..']) && strpos(strtolower($dir), 'hostfile') === false && is_dir($path)) {
+
+					    ?>
+					    <tr>
+						    <td>127.0.0.1</td>
+						    <td><?= $path ?></td>
+						    <td></td>
+						    <td><?= strtolower($dir) ?>.local</td>
+						    <td></td>
+						    <td><a href="formhandler.php?action=quickadd&path=<?=urlencode($path)?>&domain=<?=urlencode(strtolower($dir).'.local')?>">Add as HTTP</a></td>
+						    <td></td>
+						    <td><a href="formhandler.php?action=quickadd&path=<?=urlencode($path)?>&domain=<?=urlencode(strtolower($dir).'.local')?>&ssl=1">Add as HTTPS</a></td>
+					    </tr>
+				    <?
+				    }
+			    }
+
+			    ?>
+
+			    </tbody>
+		    </table>
     </div>
 
 <hr>
@@ -79,7 +153,7 @@ if(!$bError){
         <table class="host-table" cellpadding="2" cellspacing="0">
             <thead>
                 <tr>
-                    <th>IP Adress</th><th>Domain</th><th>&nbsp;</th><th>&nbsp;</th>
+                    <th>IP Address</th><th>Domain</th><th>&nbsp;</th><th>&nbsp;</th>
                 </tr>
             </thead>
             <tbody>
