@@ -23,51 +23,110 @@ function hasHost($host){
 }
 
 ?>
-<style>
-	* {
-		font-family: Verdana, Tahoma, Arial, sans-serif;
-		font-size: 11px;
-	}
-
-    h2{
-        margin-bottom:0px;
-    }
-
-    .host-table{
-        padding:0px;
-        margin:0px;
-    }
-    .host-table th{
-        text-align: left;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.20);
-        padding-right: 20px;
-    }
-
-
-    .host-table td{
-       padding-bottom:8px;
-    }
-
-    .host-table td.status,.delete,.servername{
-        padding-left:20px;
-    }
-
-
-
-</style>
-<strong>Quick add</strong><br />
-    <sup>Add your project to both files at once</sup>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script>
+	var apacheRestart = function() {
+	$("#messagebar").css("-webkit-transition-duration", "0s");
+	$("#messagebar").width("0%");
+	window.setTimeout(function() { $("#messagebar").css("-webkit-transition-duration", "5s"); }, 400);
+	
+	$("#messageBarShow").slideDown(250);
+	$("#messagebar").addClass("active");
+	$("#apacheButton").attr("disabled", "disabled");
+	var didItFail = 0;
+	$("#messagebar").width("20%");
+	$("#messagebar").html("Restarting Apache...");
+		
+	$.ajax({
+			type: 'GET',
+			url: 'formhandler.php?action=restart_apa',
+			timeout: 400,
+			success: function(data, textStatus, XMLHttpRequest) { },
+			error: function(XMLHttpRequest, textStatus, errorThrown) {	}
+		});
+	var intervalScript = window.setInterval(function() {
+		$.ajax({
+			type: 'GET',
+			url: window.location.pathname,
+			timeout: 1000,
+			success: function(data, textStatus, XMLHttpRequest) { 
+				if(didItFail == 1){
+					//window.location = window.location.pathname;
+					$("#messagebar").html("Apache is running.");
+					$("#messagebar").attr("data-dismiss","alert");
+					$("#messagebar").removeClass("active");
+					$("#apacheButton").removeAttr("disabled");
+					window.setTimeout(function() { $("#messageBarShow").slideUp(1000); }, 2000);
+					clearInterval(intervalScript);
+				}
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				if(didItFail == 0){
+					$("#messagebar").width("40%");
+					$("#messagebar").html("Apache stopped, restarting...");
+					window.setTimeout(function() { 
+						$("#messagebar").css("-webkit-transition-duration", "20s");
+						$("#messagebar").width("100%");	 
+					}, 5000);
+					
+				}
+				didItFail = 1;
+			}
+		});
+	}, 2000);
+};
+	</script>
+<?
+if(isset($_GET['restartApache']) && $_GET['restartApache'] == 1){
+?>
+<script>
+$( document ).ready( apacheRestart(); );
+</script>
+<?
+}
+?>
+<title>Hostfile Editor</title>
+</head>
+<body>
+	<div class="container">
+		<div class="progress" id="messageBarShow" style="display:none;">
+  <div id="messagebar" class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+  </div>
+</div>
+		<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">
+        HostFileEditor
+      </a>
+    </div>
+	  <form class="navbar-form navbar-right">
+	  	<button id="apacheButton" onClick="apacheRestart()" type="button" class="btn btn-primary"><i class="fa fa-refresh"></i> Restart Apache</button>
+	  </form>
+  </div>
+</nav>		
+<h4>Quick add</h4>
+    <div>Add your project to both files at once</div>
     <div style='margin-top:5px'>
-        <form action="formhandler.php?action=add_all" method="post">
+        <form class="form-inline" action="formhandler.php?action=add_all" method="post">
             Add project:<br />
-	        <input type='text' value="127.0.0.1" placeholder="IP Address" size="10" name="ipaddress" autocomplete="off">
-	        <input type='text' placeholder='domain/servername' name="domain" autocomplete="off">
-	        <input type='text' value="c:\xampp\htdocs\" placeholder="document root" name='documentroot' autocomplete="off">
+	        <input class="form-control" type='text' value="127.0.0.1" placeholder="IP Address" size="10" name="ipaddress" autocomplete="off">
+	        <input class="form-control" type='text' placeholder='domain/servername' name="domain" autocomplete="off">
+	        <input class="form-control" type='text' value="c:\xampp\htdocs\" placeholder="document root" name='documentroot' autocomplete="off">
 	        <input type='checkbox' name='ssl' value="1" autocomplete="off" id="add_all_ssl"><label for="add_all_ssl">SSL</label>
-            <button type='submit'>Add</button>
+            <button  class="btn btn-default" type='submit'>Add</button>
         </form>
 
-		    <table class="host-table" cellpadding="2" cellspacing="0">
+		    <table class="table table-striped table-condensed" cellpadding="2" cellspacing="0">
 			    <thead>
 			    <tr>
 				    <th>IP Address</th>
@@ -123,9 +182,8 @@ function hasHost($host){
 		    </table>
     </div>
 
-<hr>
  <strong>Windows hosts file:</strong><br />
- <sup><?= $oHostFileReader->windowsHostsFile ?></sup>
+ <div><?= $oHostFileReader->windowsHostsFile ?></div>
 <?
 $bError = false;
 $sMsg = "";
@@ -143,14 +201,14 @@ catch(Exception $e){
 Add host:<br />
 <input type='text' value="127.0.0.1" placeholder="IP Address" size="10" name="ipaddress" autocomplete="off">
 <input type='text' placeholder='domain' name="domain" autocomplete="off">
-<button type="submit">Add</button>
+<button class="btn btn-default" type="submit">Add</button>
 </form>
 </div>
 <?
 if(!$bError){
     ?>
     <div  style='margin-top:5px'>
-        <table class="host-table" cellpadding="2" cellspacing="0">
+        <table class="table table-striped" cellpadding="2" cellspacing="0">
             <thead>
                 <tr>
                     <th>IP Address</th><th>Domain</th><th>&nbsp;</th><th>&nbsp;</th>
@@ -192,9 +250,8 @@ else{
 }
 ?>
 
-<hr>
 <strong>Apache vhosts file:</strong><br />
-<sup><?= $oHostFileReader->apacheVHostsFile ?></sup>
+<div><?= $oHostFileReader->apacheVHostsFile ?></div>
 <?
 $bError = false;
 $sMsg = "";
@@ -217,7 +274,7 @@ catch(Exception $e){
 if(!$bError){
     ?>
 <div  style='margin-top:5px'>
-    <table class="host-table" cellpadding="2" cellspacing="0">
+    <table class="table table-striped" cellpadding="2" cellspacing="0">
         <thead>
         <tr>
             <th>Documentroot</th><th class="servername">Servername</th><th>&nbsp;</th><th>&nbsp;</th>
@@ -260,9 +317,8 @@ else{
 ?>
 
 
-	<hr>
 	<strong>Apache SSL file:</strong><br />
-	<sup><?= $oHostFileReader->apacheSSLFile ?></sup>
+	<div><?= $oHostFileReader->apacheSSLFile ?></div>
 <?
 	$bError = false;
 	$sMsg = "";
@@ -285,7 +341,7 @@ else{
 	if(!$bError){
 		?>
 		<div  style='margin-top:5px'>
-			<table class="host-table" cellpadding="2" cellspacing="0">
+			<table class="table table-striped" cellpadding="2" cellspacing="0">
 				<thead>
 					<tr>
 						<th>Documentroot</th><th class="servername">Servername</th><th>&nbsp;</th><th>&nbsp;</th>
@@ -326,3 +382,6 @@ else{
 		echo($sMsg);
 	}
 ?>
+		</div>
+	</body>
+</html>

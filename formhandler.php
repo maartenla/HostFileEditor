@@ -32,6 +32,12 @@ switch($_GET["action"]){
 
     case "quickadd":quickAdd();break;
 
+	case "restart_apa":restartApache();break;
+}
+
+function restartApache(){
+	$serviceName = exec('net start | findstr /I "Apache"');
+	exec('net stop '.$serviceName.' && net start '.$serviceName);
 }
 
 function addAll(){
@@ -84,7 +90,7 @@ function quickAdd(){
 		die();
 	}
 
-	header("location: index.php");
+	header("location: index.php?restartApache=1");
 }
 
 function addApache(){
