@@ -26,6 +26,8 @@ function hasHost($host){
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
 <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
