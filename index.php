@@ -36,6 +36,15 @@ function hasHost($host){
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script>
+	var currentPage = "quickadd";
+	var changePage = function(page){
+		$("div#"+currentPage).hide();
+		$("li.active").removeClass("active");
+		$("li#"+page).addClass("active");
+		$("div#"+page).show();
+		currentPage = page;
+	};
+		
 	var apacheRestart = function() {
 	$("#messagebar").css("-webkit-transition-duration", "0s");
 	$("#messagebar").width("0%");
@@ -62,7 +71,8 @@ function hasHost($host){
 			timeout: 1000,
 			success: function(data, textStatus, XMLHttpRequest) { 
 				if(didItFail == 1){
-					//window.location = window.location.pathname;
+					$("#messagebar").css("-webkit-transition-duration", "2s");
+					$("#messagebar").width("100%");	 
 					$("#messagebar").html("Apache is running.");
 					$("#messagebar").attr("data-dismiss","alert");
 					$("#messagebar").removeClass("active");
@@ -76,8 +86,8 @@ function hasHost($host){
 					$("#messagebar").width("40%");
 					$("#messagebar").html("Apache stopped, restarting...");
 					window.setTimeout(function() { 
-						$("#messagebar").css("-webkit-transition-duration", "20s");
-						$("#messagebar").width("100%");	 
+						$("#messagebar").css("-webkit-transition-duration", "15s");
+						$("#messagebar").width("90%");	 
 					}, 5000);
 					
 				}
@@ -99,34 +109,39 @@ $( document ).ready( apacheRestart(); );
 <title>Hostfile Editor</title>
 </head>
 <body>
+	<nav class="navbar navbar-default navbar-static-top" role="navigation">
+  		<div class="container container-fluid">
+    		<div class="navbar-header">
+      			<a class="navbar-brand" href="#">
+        			HostFileEditor <small class="visible-md-inline visible-lg-inline">for Windows &amp; XAMPP</small>
+      			</a>
+    		</div>
+	  		<ul class="nav navbar-nav navbar-right">
+		  <li id="quickadd" class="active"><a onClick="changePage('quickadd')" href="#">Quick Add</a></li>
+		  <li id="hostfile"><a onClick="changePage('hostfile')" href="#">Host File</a></li>
+		  <li id="vhost"><a onClick="changePage('vhost')" href="#">VHost</a></li>
+		  <li id="ssl"><a onClick="changePage('ssl')" href="#">SSL</a></li>
+	  </ul>
+	  	<button id="apacheButton" onClick="apacheRestart()" type="button" class="navbar-btn navbar-right btn btn-primary" style="margin-right: 15px;"><i class="fa fa-refresh"></i> Restart Apache</button>
+	  
+  </div>
+</nav>
 	<div class="container">
 		<div class="progress" id="messageBarShow" style="display:none;">
   <div id="messagebar" class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
   </div>
 </div>
-		<nav class="navbar navbar-default" role="navigation">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">
-        HostFileEditor
-      </a>
-    </div>
-	  <form class="navbar-form navbar-right">
-	  	<button id="apacheButton" onClick="apacheRestart()" type="button" class="btn btn-primary"><i class="fa fa-refresh"></i> Restart Apache</button>
-	  </form>
-  </div>
-</nav>		
-<h4>Quick add</h4>
-    <div>Add your project to both files at once</div>
-    <div style='margin-top:5px'>
+<div id="quickadd">
+<p>Add your project to the Host file and Apache VHost file at once.</p>
+    <div class="well">
         <form class="form-inline" action="formhandler.php?action=add_all" method="post">
-            Add project:<br />
 	        <input class="form-control" type='text' value="127.0.0.1" placeholder="IP Address" size="10" name="ipaddress" autocomplete="off">
 	        <input class="form-control" type='text' placeholder='domain/servername' name="domain" autocomplete="off">
 	        <input class="form-control" type='text' value="c:\xampp\htdocs\" placeholder="document root" name='documentroot' autocomplete="off">
 	        <input type='checkbox' name='ssl' value="1" autocomplete="off" id="add_all_ssl"><label for="add_all_ssl">SSL</label>
             <button  class="btn btn-default" type='submit'>Add</button>
         </form>
+		</div>
 
 		    <table class="table table-striped table-condensed" cellpadding="2" cellspacing="0">
 			    <thead>
@@ -182,8 +197,8 @@ $( document ).ready( apacheRestart(); );
 
 			    </tbody>
 		    </table>
-    </div>
-
+</div>
+<div id="hostfile" style="display: none">
  <strong>Windows hosts file:</strong><br />
  <div><?= $oHostFileReader->windowsHostsFile ?></div>
 <?
@@ -251,7 +266,8 @@ else{
     echo($sMsg);
 }
 ?>
-
+</div>
+<div id="vhost" style="display: none">
 <strong>Apache vhosts file:</strong><br />
 <div><?= $oHostFileReader->apacheVHostsFile ?></div>
 <?
@@ -317,8 +333,8 @@ else{
     echo($sMsg);
 }
 ?>
-
-
+</div>
+<div id="ssl" style="display: none">
 	<strong>Apache SSL file:</strong><br />
 	<div><?= $oHostFileReader->apacheSSLFile ?></div>
 <?
@@ -384,6 +400,7 @@ else{
 		echo($sMsg);
 	}
 ?>
+	</div>
 		</div>
 	</body>
 </html>
