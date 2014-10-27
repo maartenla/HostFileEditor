@@ -139,7 +139,7 @@ $( document ).ready( apacheRestart(); );
 	        <input class="form-control" type='text' placeholder='domain/servername' name="domain" autocomplete="off">
 	        <input class="form-control" type='text' value="c:\xampp\htdocs\" placeholder="document root" name='documentroot' autocomplete="off">
 	        <input type='checkbox' name='ssl' value="1" autocomplete="off" id="add_all_ssl"><label for="add_all_ssl">SSL</label>
-            <button  class="btn btn-default" type='submit'>Add</button>
+            <button class="btn btn-primary" type='submit'><i class="fa fa-plus"></i> Add</button>
         </form>
 		</div>
 
@@ -213,12 +213,11 @@ catch(Exception $e){
 }
 ?>
 
-<div style='margin-top:5px'>
+<div class="well">
 <form class="form-inline" action="formhandler.php?action=add_win" method="post">
-Add host:<br />
 <input class="form-control" type='text' value="127.0.0.1" placeholder="IP Address" size="10" name="ipaddress" autocomplete="off">
 <input class="form-control" type='text' placeholder='domain' name="domain" autocomplete="off">
-<button class="btn btn-default" type="submit">Add</button>
+<button class="btn btn-primary" type="submit"><i class="fa fa-plus"></i> Add</button>
 </form>
 </div>
 <?
@@ -281,11 +280,11 @@ catch(Exception $e){
     $sMsg = $e->getMessage();
 }
 ?>
-<div style='margin-top:5px'>
+<div class="well">
     <form class="form-inline" action="formhandler.php?action=add_apa" method="post">
-        Add vhost:<br />
 		<input class="form-control" type='text' placeholder="document root" name="documentroot" value="c:\xampp\htdocs\" autocomplete="off">
-		<input class="form-control" type='text'  placeholder='servername' name="servername" autocomplete="off"> <button class="btn btn-default"  type="submit">Add</button>
+		<input class="form-control" type='text'  placeholder='servername' name="servername" autocomplete="off"> 
+		<button class="btn btn-primary"  type="submit"><i class="fa fa-plus"></i> Add</button>
     </form>
 </div>
 <?
@@ -348,11 +347,11 @@ else{
 		$sMsg = $e->getMessage();
 	}
 ?>
-	<div style='margin-top:5px'>
+	<div class="well">
 		<form class="form-inline" action="formhandler.php?action=add_apassl" method="post">
-			Add vhost:<br /><input class="form-control" type='text' placeholder="document root" name="documentroot" autocomplete="off">
+			<input class="form-control" type='text' placeholder="document root" name="documentroot" autocomplete="off">
 			<input class="form-control" type='text' placeholder='servername' name="servername" autocomplete="off">
-			<button class="btn btn-default" type="submit">Add</button>
+			<button class="btn btn-primary" type="submit"><i class="fa fa-plus"></i> Add</button>
 		</form>
 	</div>
 <?
