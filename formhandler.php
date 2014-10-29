@@ -9,30 +9,37 @@ foreach($_POST as $key=>$val){
     $_POST[$key] = trim($val);
 }
 
+if(!isset($_GET["action"])){
+	http_response_code(501);
+	die();
+}
+
 switch($_GET["action"]){
-    case "status_win": changeStatusWin();        break;
+    case "status_win":		changeStatusWin();		break;
 
-    case "delete_win": deleteWin();              break;
+    case "delete_win":		deleteWin();			break;
 
-    case "add_win":     addWin();               break;
+    case "add_win":			addWin();				break;
 
-    case "status_apa": changeStatusApache();break;
+    case "status_apa":		changeStatusApache();	break;
 
-    case"delete_apa": deleteApache();break;
+    case "delete_apa":		deleteApache();			break;
 
-    case "add_apa": addApache();break;
+    case "add_apa":			addApache();			break;
 
-    case "status_apassl": changeStatusApacheSSL();break;
+    case "status_apassl":	changeStatusApacheSSL();break;
 
-    case"delete_apassl": deleteApacheSSL();break;
+    case "delete_apassl":	deleteApacheSSL();		break;
 
-    case "add_apassl": addApacheSSL();break;
+    case "add_apassl":		addApacheSSL();			break;
 
-    case "add_all":addAll();break;
+    case "add_all":			addAll();				break;
 
-    case "quickadd":quickAdd();break;
+    case "quickadd":		quickAdd();				break;
 
-	case "restart_apa":restartApache();break;
+	case "restart_apa":		restartApache();		break;
+	
+	default:				http_response_code(501); die;
 }
 
 function restartApache(){
@@ -58,14 +65,11 @@ function addAll(){
 
     }
     catch(Exception $e){
-        echo($e->getMessage());
-        echo("<br><a href='index.php'>click to go back</a>");
-        die();
+		respondError($e->getMessage());
     }
 
     header("location: index.php");
 }
-
 
 function quickAdd(){
 	try{
@@ -85,9 +89,7 @@ function quickAdd(){
 
 	}
 	catch(Exception $e){
-		echo($e->getMessage());
-		echo("<br><a href='index.php'>click to go back</a>");
-		die();
+		respondError($e->getMessage());
 	}
 
 	header("location: index.php?restartApache=1");
@@ -103,9 +105,7 @@ function addApache(){
         $oHostFileReader->addApacheVHost($documentroot,$servername);
     }
     catch(Exception $e){
-        echo($e->getMessage());
-        echo("<br><a href='index.php'>click to go back</a>");
-        die();
+        respondError($e->getMessage());
     }
 
     header("location: index.php");
@@ -120,9 +120,7 @@ function deleteApache(){
         $oHostFileReader->deleteApacheVHost($servername);
     }
     catch(Exception $e){
-        echo($e->getMessage());
-        echo("<br><a href='index.php'>click to go back</a>");
-        die();
+        respondError($e->getMessage());
     }
 
     header("location: index.php");
@@ -131,17 +129,21 @@ function deleteApache(){
 }
 
 function changeStatusApache(){
+	try{
     $servername = $_GET["servername"];
     $status = $_GET["to"];
 
     $oHostFileReader = new HostFileReader();
 
     $oHostFileReader->changeApacheVHostStatus($servername,$status);
-
+	}
+	catch(Exception $e){
+		respondError($e->getMessage());
+	}
+	
     header("location: index.php");
 
 }
-
 
 function addApacheSSL(){
 	try{
@@ -153,9 +155,7 @@ function addApacheSSL(){
 		$oHostFileReader->addApacheSSL($documentroot,$servername);
 	}
 	catch(Exception $e){
-		echo($e->getMessage());
-		echo("<br><a href='index.php'>click to go back</a>");
-		die();
+		respondError($e->getMessage());
 	}
 
 	header("location: index.php");
@@ -170,26 +170,30 @@ function deleteApacheSSL(){
 		$oHostFileReader->deleteApacheSSL($servername);
 	}
 	catch(Exception $e){
-		echo($e->getMessage());
-		echo("<br><a href='index.php'>click to go back</a>");
-		die();
+		respondError($e->getMessage());
 	}
 
 	header("location: index.php");
 }
 
 function changeStatusApacheSSL(){
+	try{
 	$servername = $_GET["servername"];
 	$status = $_GET["to"];
 
 	$oHostFileReader = new HostFileReader();
 
 	$oHostFileReader->changeApacheSSLStatus($servername,$status);
+	}
+	catch(Exception $e){
+		respondError($e->getMessage());
+	}
 
 	header("location: index.php");
 }
 
 function changeStatusWin(){
+	try{
     $domain = $_GET["domain"];
     $status = $_GET["to"];
     $ipaddress = $_GET["ip"];
@@ -197,17 +201,25 @@ function changeStatusWin(){
     $oHostFileReader = new HostFileReader();
 
     $oHostFileReader->changeWindowsHostLineStatus($domain,$status,$ipaddress);
+	}
+	catch(Exception $e){
+		respondError($e->getMessage());
+	}
 
-    header("Location: index.php");
 }
 
 function deleteWin(){
+	try{
     $domain = $_GET["domain"];
     $ipaddress = $_GET["ipaddress"];
 
     $oHostFileReader = new HostFileReader();
 
     $oHostFileReader->deleteWindowsHost($ipaddress,$domain);
+	}
+	catch(Exception $e){
+		respondError($e->getMessage());
+	}
 
     header("location: index.php");
 }
@@ -221,11 +233,15 @@ function addWin(){
         $oHostFileReader->addWindowsHost($ipaddress,$domain);
     }
     catch(Exception $e){
-        echo($e->getMessage());
-        echo("<br><a href='index.php'>click to go back</a>");
+        respondError($e->getMessage());
     }
 
     header("Location: index.php");
 }
 
+function respondError($message = ""){
+	http_response_code(400);
+	echo $message;
+	die();
+}
 ?>

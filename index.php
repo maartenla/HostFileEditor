@@ -31,11 +31,9 @@ function hasHost($host){
 <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-	<script>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script>
 	var currentPage = "quickadd";
 	var changePage = function(page){
 		$("div#"+currentPage).hide();
@@ -46,57 +44,84 @@ function hasHost($host){
 	};
 		
 	var apacheRestart = function() {
-	$("#messagebar").css("-webkit-transition-duration", "0s");
-	$("#messagebar").width("0%");
-	window.setTimeout(function() { $("#messagebar").css("-webkit-transition-duration", "5s"); }, 400);
+		$("#loadingbar").css("-webkit-transition-duration", "0s");
+		$("#loadingbar").width("0%");
+		window.setTimeout(function() { $("#loadingbar").css("-webkit-transition-duration", "5s"); }, 400);
 	
-	$("#messageBarShow").slideDown(250);
-	$("#messagebar").addClass("active");
-	$("#apacheButton").attr("disabled", "disabled");
-	var didItFail = 0;
-	$("#messagebar").width("20%");
-	$("#messagebar").html("Restarting Apache...");
+		$("#loading").slideDown(250);
+		$("#loadingbar").addClass("active");
+		$("#apacheButton").attr("disabled", "disabled");
+		var didItFail = 0;
+		$("#loadingbar").width("20%");
+		$("#loadingbar").html("Restarting Apache...");
 		
-	$.ajax({
+		$.ajax({
 			type: 'GET',
 			url: 'formhandler.php?action=restart_apa',
 			timeout: 400,
 			success: function(data, textStatus, XMLHttpRequest) { },
-			error: function(XMLHttpRequest, textStatus, errorThrown) {	}
+			error: function(XMLHttpRequest, textStatus, errorThrown) {}
 		});
-	var intervalScript = window.setInterval(function() {
+		var intervalScript = window.setInterval(function() {
+			$.ajax({
+				type: 'GET',
+				url: window.location.pathname,
+				timeout: 1000,
+				success: function(data, textStatus, XMLHttpRequest) { 
+					if(didItFail == 1){
+						$("#loadingbar").css("-webkit-transition-duration", "2s");
+						$("#loadingbar").width("100%");	 
+						$("#loadingbar").html("Apache is running.");
+						$("#loadingbar").attr("data-dismiss","alert");
+						$("#loadingbar").removeClass("active");
+						$("#apacheButton").removeAttr("disabled");
+						window.setTimeout(function() { $("#loading").slideUp(1000); }, 2000);
+						clearInterval(intervalScript);
+					}
+				},
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+					if(didItFail == 0){
+						$("#loadingbar").width("40%");
+						$("#loadingbar").html("Apache stopped, restarting...");
+						window.setTimeout(function() { 
+							$("#loadingbar").css("-webkit-transition-duration", "15s");
+							$("#loadingbar").width("90%");	 
+						}, 5000);
+						
+					}
+					didItFail = 1;
+				}
+			});
+		}, 2000);
+	};
+	
+	var statusWinToggle  = function(element, status, domain, ip) {
+		var icon = "fa-toggle-off";
+		var oIcon = "fa-toggle-on";
+		if(status == "e"){
+			icon = "fa-toggle-on";
+			var oIcon = "fa-toggle-off";
+		}
+		var successFunction = function(){ 
+			console.log(element);
+			var icon = element.find($('.fa')); 
+			icon.removeClass(oIcon); 
+			icon.addClass(icon); 
+		};
 		$.ajax({
 			type: 'GET',
-			url: window.location.pathname,
-			timeout: 1000,
-			success: function(data, textStatus, XMLHttpRequest) { 
-				if(didItFail == 1){
-					$("#messagebar").css("-webkit-transition-duration", "2s");
-					$("#messagebar").width("100%");	 
-					$("#messagebar").html("Apache is running.");
-					$("#messagebar").attr("data-dismiss","alert");
-					$("#messagebar").removeClass("active");
-					$("#apacheButton").removeAttr("disabled");
-					window.setTimeout(function() { $("#messageBarShow").slideUp(1000); }, 2000);
-					clearInterval(intervalScript);
-				}
-			},
-			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				if(didItFail == 0){
-					$("#messagebar").width("40%");
-					$("#messagebar").html("Apache stopped, restarting...");
-					window.setTimeout(function() { 
-						$("#messagebar").css("-webkit-transition-duration", "15s");
-						$("#messagebar").width("90%");	 
-					}, 5000);
-					
-				}
-				didItFail = 1;
-			}
+			url: 'formhandler.php?action=status_win&to='+status+'&domain='+domain+'&ip='+ip,
+			timeout: 400,
+			success: function(data, textStatus, XMLHttpRequest, element) { successFunction() },
+			error: function(XMLHttpRequest, textStatus, errorThrown) { showError(XMLHttpRequest.responseText) }
 		});
-	}, 2000);
-};
-	</script>
+	};
+	
+	var showError = function(message) {
+		$("#main").prepend('<div class="alert alert-dismissable alert-danger" role="alert" id="notification" style="display:none;"><button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>'+message+'</div>');
+		$("#notification").slideDown(250);
+	};
+</script>
 <?
 if(isset($_GET['restartApache']) && $_GET['restartApache'] == 1){
 ?>
@@ -126,11 +151,10 @@ $( document ).ready( apacheRestart(); );
 	  
   </div>
 </nav>
-	<div class="container">
-		<div class="progress" id="messageBarShow" style="display:none;">
-  <div id="messagebar" class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-  </div>
-</div>
+<div id="main" class="container">
+		<div class="progress" id="loading" style="display:none;">
+  			<div id="loadingbar" class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+		</div>
 <div id="quickadd">
 <p>Add your project to the Host file and Apache VHost file at once.</p>
     <div class="well">
@@ -226,7 +250,7 @@ if(!$bError){
         <table class="table table-striped" cellpadding="2" cellspacing="0">
             <thead>
                 <tr>
-                    <th>IP Address</th><th>Domain</th><th>&nbsp;</th><th>&nbsp;</th>
+                    <th>IP Address</th><th>Domain</th><th class="col-md-1">&nbsp;</th><th class="col-md-1">&nbsp;</th>
                 </tr>
             </thead>
             <tbody>
@@ -244,8 +268,8 @@ if(!$bError){
                     <tr>
                         <td><?= $aWindowsHost[2] ?></td>
                         <td><a href="http://<?= $aWindowsHost[3] ?>" target="_blank"><?= $aWindowsHost[3] ?></a></td>
-                        <td class="status"><a href="formhandler.php?action=status_win&to=<?= $toStatus ?>&domain=<?= $aWindowsHost[3] ?>&ip=<?= $aWindowsHost[2] ?>"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
-                        <td class="delete"><a href="formhandler.php?action=delete_win&domain=<?= $aWindowsHost[3] ?>&ipaddress=<?= $aWindowsHost[2] ?>"><i class="fa fa-trash"></i></a></td>
+                        <td class="col-md-1 status"><a onClick="statusWinToggle(this, '<?= $toStatus ?>','<?= $aWindowsHost[3] ?>','<?= $aWindowsHost[2] ?>')"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
+                        <td class="col-md-1 delete"><a href="formhandler.php?action=delete_win&domain=<?= $aWindowsHost[3] ?>&ipaddress=<?= $aWindowsHost[2] ?>"><i class="fa fa-trash-o"></i></a></td>
                     </tr>
                     <?
                 }
@@ -292,7 +316,7 @@ if(!$bError){
     <table class="table table-striped" cellpadding="2" cellspacing="0">
         <thead>
         <tr>
-            <th>Documentroot</th><th class="servername">Servername</th><th>&nbsp;</th><th>&nbsp;</th>
+            <th>Documentroot</th><th class="servername">Servername</th><th class="col-md-1">&nbsp;</th><th class="col-md-1">&nbsp;</th>
         </tr>
         </thead>
         <tbody>
@@ -310,8 +334,8 @@ if(!$bError){
             <tr>
                 <td><?= $aApacheSSLHost[1] ?></td>
                 <td class="servername"><a href="http://<?= $aApacheSSLHost[2] ?>" target="_blank"><?= $aApacheSSLHost[2] ?></a></td>
-                <td class="status"><a href="formhandler.php?action=status_apa&to=<?= $toStatus ?>&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
-                <td class="delete"><a href="formhandler.php?action=delete_apa&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-trash"></i></a></td>
+                <td class="col-md-1 status"><a href="formhandler.php?action=status_apa&to=<?= $toStatus ?>&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
+                <td class="col-md-1 delete"><a href="formhandler.php?action=delete_apa&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-trash-o"></i></a></td>
             </tr>
                 <?
             }
@@ -358,7 +382,7 @@ else{
 			<table class="table table-striped" cellpadding="2" cellspacing="0">
 				<thead>
 					<tr>
-						<th>Documentroot</th><th class="servername">Servername</th><th>&nbsp;</th><th>&nbsp;</th>
+						<th>Documentroot</th><th class="servername">Servername</th><th class="col-md-1">&nbsp;</th><th class="col-md-1">&nbsp;</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -376,8 +400,8 @@ else{
 							<tr>
 								<td><?= $aApacheSSLHost[1] ?></td>
 								<td class="servername"><a href="https://<?= $aApacheSSLHost[2] ?>" target="_blank"><?= $aApacheSSLHost[2] ?></a></td>
-								<td class="status"><a href="formhandler.php?action=status_apassl&to=<?= $toStatus ?>&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
-								<td class="delete"><a href="formhandler.php?action=delete_apassl&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-trash"></i></a></td>
+								<td class="col-md-1 status"><a href="formhandler.php?action=status_apassl&to=<?= $toStatus ?>&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
+								<td class=" col-md-1delete"><a href="formhandler.php?action=delete_apassl&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-trash-o"></i></a></td>
 							</tr>
 						<?
 						}

@@ -1,0 +1,19 @@
+.status i{
+	font-size: 24px;
+}
+
+td.status{
+	padding: 6px 0 0 0 !important;
+}
+
+.fa-toggle-on{
+	color: #3c763d;
+}
+
+.fa-toggle-off{
+	color: #a94442;
+}
+
+.fa-trash, .fa-trash-o{
+	color: #000;
+}
