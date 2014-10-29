@@ -199,8 +199,7 @@ $( document ).ready( apacheRestart(); );
 		    </table>
 </div>
 <div id="hostfile" style="display: none">
- <strong>Windows hosts file:</strong><br />
- <div><?= $oHostFileReader->windowsHostsFile ?></div>
+ <p><?= $oHostFileReader->windowsHostsFile ?></p>
 <?
 $bError = false;
 $sMsg = "";
@@ -267,8 +266,7 @@ else{
 ?>
 </div>
 <div id="vhost" style="display: none">
-<strong>Apache vhosts file:</strong><br />
-<div><?= $oHostFileReader->apacheVHostsFile ?></div>
+<p><?= $oHostFileReader->apacheVHostsFile ?></p>
 <?
 $bError = false;
 $sMsg = "";
@@ -334,8 +332,7 @@ else{
 ?>
 </div>
 <div id="ssl" style="display: none">
-	<strong>Apache SSL file:</strong><br />
-	<div><?= $oHostFileReader->apacheSSLFile ?></div>
+<p><?= $oHostFileReader->apacheSSLFile ?></p>
 <?
 	$bError = false;
 	$sMsg = "";
