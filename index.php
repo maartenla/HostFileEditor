@@ -408,7 +408,7 @@ else{
 							<tr>
 								<td><?= $aApacheSSLHost[1] ?></td>
 								<td class="servername"><a href="https://<?= $aApacheSSLHost[2] ?>" target="_blank"><?= $aApacheSSLHost[2] ?></a></td>
-								<td class="col-md-1 status"><a href="formhandler.php?action=status_apassl&to=<?= $toStatus ?>&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
+								<td class="col-md-1 status"><a data-action="status_apassl" data-to="<?= $toStatus ?>" onClick="statusToggle(this, '<?= $aApacheSSLHost[2] ?>')"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>  
 								<td class=" col-md-1delete"><a href="formhandler.php?action=delete_apassl&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-trash-o"></i></a></td>
 							</tr>
 						<?

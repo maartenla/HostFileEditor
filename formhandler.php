@@ -176,7 +176,7 @@ function deleteApacheSSL(){
 
 function changeStatusApacheSSL(){
 	try{
-	$servername = $_GET["servername"];
+	$servername = $_GET["domain"];
 	$status = $_GET["to"];
 
 	$oHostFileReader = new HostFileReader();
@@ -187,7 +187,6 @@ function changeStatusApacheSSL(){
 		respondError($e->getMessage());
 	}
 
-	header("location: index.php");
 }
 
 function changeStatusWin(){
