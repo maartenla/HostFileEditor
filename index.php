@@ -97,22 +97,24 @@ function hasHost($host){
 	
 	var statusWinToggle  = function(element, domain, ip) {
 		var status = $(element).data("action");
-		console.log(status);
 		var nIcon = "fa-toggle-off";
 		var oIcon = "fa-toggle-on";
 		if(status == "e"){
 			nIcon = "fa-toggle-on";
 			var oIcon = "fa-toggle-off";
 		}
+		var icon = $(element).children('i'); 
+		icon.removeClass(oIcon)
+		icon.addClass("fa-circle-o-notch fa-spin");
+		
 		var successFunction = function(){ 
 			if($(element).data("action") == "e"){
 				$(element).data("action", "d");
 			} else { 
 				$(element).data("action", "e");
 			}
-			var icon = $(element).children('i'); 
 			icon.addClass(nIcon);
-			icon.removeClass(oIcon); 
+			icon.removeClass("fa-circle-o-notch fa-spin"); 
 		};
 		$.ajax({
 			type: 'GET',
