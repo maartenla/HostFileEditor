@@ -8,12 +8,15 @@ td.status{
 
 .fa-toggle-on{
 	color: #3c763d;
+	cursor: pointer;
 }
 
 .fa-toggle-off{
 	color: #a94442;
+	cursor: pointer;
 }
 
 .fa-trash, .fa-trash-o, .fa-circle-o-notch{
 	color: #000;
+	cursor: pointer;
 }
