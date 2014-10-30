@@ -95,23 +95,28 @@ function hasHost($host){
 		}, 2000);
 	};
 	
-	var statusWinToggle  = function(element, status, domain, ip) {
-		var icon = "fa-toggle-off";
+	var statusWinToggle  = function(element, domain, ip) {
+		var status = $(element).data("action");
+		console.log(status);
+		var nIcon = "fa-toggle-off";
 		var oIcon = "fa-toggle-on";
 		if(status == "e"){
-			icon = "fa-toggle-on";
+			nIcon = "fa-toggle-on";
 			var oIcon = "fa-toggle-off";
 		}
 		var successFunction = function(){ 
-			console.log(element);
-			var icon = element.find($('.fa')); 
+			if($(element).data("action") == "e"){
+				$(element).data("action", "d");
+			} else { 
+				$(element).data("action", "e");
+			}
+			var icon = $(element).children('i'); 
+			icon.addClass(nIcon);
 			icon.removeClass(oIcon); 
-			icon.addClass(icon); 
 		};
 		$.ajax({
 			type: 'GET',
 			url: 'formhandler.php?action=status_win&to='+status+'&domain='+domain+'&ip='+ip,
-			timeout: 400,
 			success: function(data, textStatus, XMLHttpRequest, element) { successFunction() },
 			error: function(XMLHttpRequest, textStatus, errorThrown) { showError(XMLHttpRequest.responseText) }
 		});
@@ -268,7 +273,7 @@ if(!$bError){
                     <tr>
                         <td><?= $aWindowsHost[2] ?></td>
                         <td><a href="http://<?= $aWindowsHost[3] ?>" target="_blank"><?= $aWindowsHost[3] ?></a></td>
-                        <td class="col-md-1 status"><a onClick="statusWinToggle(this, '<?= $toStatus ?>','<?= $aWindowsHost[3] ?>','<?= $aWindowsHost[2] ?>')"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
+                        <td class="col-md-1 status"><a data-action="<?= $toStatus ?>" onClick="statusWinToggle(this, '<?= $aWindowsHost[3] ?>','<?= $aWindowsHost[2] ?>')"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
                         <td class="col-md-1 delete"><a href="formhandler.php?action=delete_win&domain=<?= $aWindowsHost[3] ?>&ipaddress=<?= $aWindowsHost[2] ?>"><i class="fa fa-trash-o"></i></a></td>
                     </tr>
                     <?
