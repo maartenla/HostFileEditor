@@ -130,7 +130,7 @@ function deleteApache(){
 
 function changeStatusApache(){
 	try{
-    $servername = $_GET["servername"];
+    $servername = $_GET["domain"];
     $status = $_GET["to"];
 
     $oHostFileReader = new HostFileReader();
@@ -140,8 +140,6 @@ function changeStatusApache(){
 	catch(Exception $e){
 		respondError($e->getMessage());
 	}
-	
-    header("location: index.php");
 
 }
 

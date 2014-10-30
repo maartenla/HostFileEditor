@@ -95,8 +95,9 @@ function hasHost($host){
 		}, 2000);
 	};
 	
-	var statusWinToggle  = function(element, domain, ip) {
-		var status = $(element).data("action");
+	var statusToggle  = function(element, domain, ip) {
+		var status = $(element).data("to");
+		var action = $(element).data("action");
 		var nIcon = "fa-toggle-off";
 		var oIcon = "fa-toggle-on";
 		if(status == "e"){
@@ -108,17 +109,17 @@ function hasHost($host){
 		icon.addClass("fa-circle-o-notch fa-spin");
 		
 		var successFunction = function(){ 
-			if($(element).data("action") == "e"){
-				$(element).data("action", "d");
+			if($(element).data("to") == "e"){
+				$(element).data("to", "d");
 			} else { 
-				$(element).data("action", "e");
+				$(element).data("to", "e");
 			}
 			icon.addClass(nIcon);
 			icon.removeClass("fa-circle-o-notch fa-spin"); 
 		};
 		$.ajax({
 			type: 'GET',
-			url: 'formhandler.php?action=status_win&to='+status+'&domain='+domain+'&ip='+ip,
+			url: 'formhandler.php?action='+action+'&to='+status+'&domain='+domain+'&ip='+ip,
 			success: function(data, textStatus, XMLHttpRequest, element) { successFunction() },
 			error: function(XMLHttpRequest, textStatus, errorThrown) { showError(XMLHttpRequest.responseText) }
 		});
@@ -275,7 +276,7 @@ if(!$bError){
                     <tr>
                         <td><?= $aWindowsHost[2] ?></td>
                         <td><a href="http://<?= $aWindowsHost[3] ?>" target="_blank"><?= $aWindowsHost[3] ?></a></td>
-                        <td class="col-md-1 status"><a data-action="<?= $toStatus ?>" onClick="statusWinToggle(this, '<?= $aWindowsHost[3] ?>','<?= $aWindowsHost[2] ?>')"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
+                        <td class="col-md-1 status"><a data-action="status_win" data-to="<?= $toStatus ?>" onClick="statusToggle(this, '<?= $aWindowsHost[3] ?>','<?= $aWindowsHost[2] ?>')"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
                         <td class="col-md-1 delete"><a href="formhandler.php?action=delete_win&domain=<?= $aWindowsHost[3] ?>&ipaddress=<?= $aWindowsHost[2] ?>"><i class="fa fa-trash-o"></i></a></td>
                     </tr>
                     <?
@@ -341,7 +342,7 @@ if(!$bError){
             <tr>
                 <td><?= $aApacheSSLHost[1] ?></td>
                 <td class="servername"><a href="http://<?= $aApacheSSLHost[2] ?>" target="_blank"><?= $aApacheSSLHost[2] ?></a></td>
-                <td class="col-md-1 status"><a href="formhandler.php?action=status_apa&to=<?= $toStatus ?>&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
+				<td class="col-md-1 status"><a data-action="status_apa" data-to="<?= $toStatus ?>" onClick="statusToggle(this, '<?= $aApacheSSLHost[2] ?>')"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>  
                 <td class="col-md-1 delete"><a href="formhandler.php?action=delete_apa&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-trash-o"></i></a></td>
             </tr>
                 <?
