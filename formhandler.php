@@ -113,7 +113,7 @@ function addApache(){
 
 function deleteApache(){
     try{
-        $servername = $_GET["servername"];
+        $servername = $_GET["domain"];
 
         $oHostFileReader = new HostFileReader();
 
@@ -122,10 +122,6 @@ function deleteApache(){
     catch(Exception $e){
         respondError($e->getMessage());
     }
-
-    header("location: index.php");
-
-
 }
 
 function changeStatusApache(){
@@ -161,7 +157,7 @@ function addApacheSSL(){
 
 function deleteApacheSSL(){
 	try{
-		$servername = $_GET["servername"];
+		$servername = $_GET["domain"];
 
 		$oHostFileReader = new HostFileReader();
 
@@ -170,8 +166,6 @@ function deleteApacheSSL(){
 	catch(Exception $e){
 		respondError($e->getMessage());
 	}
-
-	header("location: index.php");
 }
 
 function changeStatusApacheSSL(){
@@ -208,7 +202,7 @@ function changeStatusWin(){
 function deleteWin(){
 	try{
     $domain = $_GET["domain"];
-    $ipaddress = $_GET["ipaddress"];
+    $ipaddress = $_GET["ip"];
 
     $oHostFileReader = new HostFileReader();
 
@@ -217,8 +211,6 @@ function deleteWin(){
 	catch(Exception $e){
 		respondError($e->getMessage());
 	}
-
-    header("location: index.php");
 }
 
 function addWin(){

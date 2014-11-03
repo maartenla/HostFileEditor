@@ -125,6 +125,20 @@ function hasHost($host){
 		});
 	};
 	
+	var deleteRow = function(element, domain, ip) {
+		var action = $(element).data("action");
+		
+		var successFunction = function(){
+			$(element).parent().parent().remove();
+		};
+		$.ajax({
+			type: 'GET',
+			url: 'formhandler.php?action='+action+'&domain='+domain+'&ip='+ip,
+			success: function(data, textStatus, XMLHttpRequest, element) { successFunction() },
+			error: function(XMLHttpRequest, textStatus, errorThrown) { showError(XMLHttpRequest.responseText) }
+		});
+	};
+	
 	var showError = function(message) {
 		$("#main").prepend('<div class="alert alert-dismissable alert-danger" role="alert" id="notification" style="display:none;"><button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>'+message+'</div>');
 		$("#notification").slideDown(250);
@@ -277,7 +291,7 @@ if(!$bError){
                         <td><?= $aWindowsHost[2] ?></td>
                         <td><a href="http://<?= $aWindowsHost[3] ?>" target="_blank"><?= $aWindowsHost[3] ?></a></td>
                         <td class="col-md-1 status"><a data-action="status_win" data-to="<?= $toStatus ?>" onClick="statusToggle(this, '<?= $aWindowsHost[3] ?>','<?= $aWindowsHost[2] ?>')"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>
-                        <td class="col-md-1 delete"><a href="formhandler.php?action=delete_win&domain=<?= $aWindowsHost[3] ?>&ipaddress=<?= $aWindowsHost[2] ?>"><i class="fa fa-trash-o"></i></a></td>
+						<td class="col-md-1 delete"><a data-action="delete_win" onClick="deleteRow(this, '<?= $aWindowsHost[3] ?>', '<?= $aWindowsHost[2] ?>')"><i class="fa fa-trash-o"></i></a></td>
                     </tr>
                     <?
                 }
@@ -343,7 +357,7 @@ if(!$bError){
                 <td><?= $aApacheSSLHost[1] ?></td>
                 <td class="servername"><a href="http://<?= $aApacheSSLHost[2] ?>" target="_blank"><?= $aApacheSSLHost[2] ?></a></td>
 				<td class="col-md-1 status"><a data-action="status_apa" data-to="<?= $toStatus ?>" onClick="statusToggle(this, '<?= $aApacheSSLHost[2] ?>')"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>  
-                <td class="col-md-1 delete"><a href="formhandler.php?action=delete_apa&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-trash-o"></i></a></td>
+                <td class="col-md-1 delete"><a data-action="delete_apa" onClick="deleteRow(this, '<?= $aApacheSSLHost[2] ?>')"><i class="fa fa-trash-o"></i></a></td>
             </tr>
                 <?
             }
@@ -409,7 +423,7 @@ else{
 								<td><?= $aApacheSSLHost[1] ?></td>
 								<td class="servername"><a href="https://<?= $aApacheSSLHost[2] ?>" target="_blank"><?= $aApacheSSLHost[2] ?></a></td>
 								<td class="col-md-1 status"><a data-action="status_apassl" data-to="<?= $toStatus ?>" onClick="statusToggle(this, '<?= $aApacheSSLHost[2] ?>')"><i class="fa fa-<?=$sStatusImage?>"></i></a></td>  
-								<td class=" col-md-1delete"><a href="formhandler.php?action=delete_apassl&servername=<?= $aApacheSSLHost[2] ?>"><i class="fa fa-trash-o"></i></a></td>
+								<td class=" col-md-1delete"><a data-action="delete_apassl" onClick="deleteRow(this, '<?= $aApacheSSLHost[2] ?>')"><i class="fa fa-trash-o"></i></a></td>
 							</tr>
 						<?
 						}
